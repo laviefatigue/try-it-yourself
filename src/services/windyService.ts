@@ -61,7 +61,7 @@ export class WindyService {
           error: 'Invalid response from Windy.com API',
         };
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching wind forecast:', error);
       let errorMessage = 'Failed to fetch wind forecast from Windy.com';
 

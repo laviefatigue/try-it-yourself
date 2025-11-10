@@ -1,14 +1,37 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import { body, validationResult } from 'express-validator';
+import rateLimit from 'express-rate-limit';
 import User from '../models/User';
 import { generateToken, authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
+// Rate limiters to prevent brute force attacks
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 requests per windowMs
+  message: {
+    error: 'Too many authentication attempts. Please try again after 15 minutes.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // Limit each IP to 3 registration attempts per hour
+  message: {
+    error: 'Too many registration attempts. Please try again after 1 hour.',
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Register
 router.post(
   '/register',
+  registerLimiter,
   [
     body('email').isEmail().normalizeEmail(),
     body('password').isLength({ min: 6 }),
@@ -59,6 +82,7 @@ router.post(
 // Login
 router.post(
   '/login',
+  authLimiter,
   [body('email').isEmail().normalizeEmail(), body('password').exists()],
   async (req, res) => {
     const errors = validationResult(req);

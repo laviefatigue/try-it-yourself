@@ -6,6 +6,15 @@ import { LAGOON_440_POLAR, getSpeedFromPolar, findOptimalVMG } from '../data/lag
 
 /**
  * Calculate apparent wind angle from true wind
+ *
+ * Apparent wind is the wind experienced on the boat, which is the vector sum
+ * of the true wind and the boat's motion through the water.
+ *
+ * @param trueWindAngle - True wind angle in degrees (0-360)
+ * @param trueWindSpeed - True wind speed in knots
+ * @param boatSpeed - Boat speed in knots
+ * @param boatHeading - Boat heading in degrees (0-360) - currently not used but kept for API compatibility
+ * @returns Apparent wind angle in degrees (0-360)
  */
 export function calculateApparentWindAngle(
   trueWindAngle: number,
@@ -13,9 +22,57 @@ export function calculateApparentWindAngle(
   boatSpeed: number,
   boatHeading: number
 ): number {
-  // Simplified calculation - in reality this is more complex
-  const twa = trueWindAngle;
-  return twa;
+  // Convert TWA to radians
+  const twaRad = (trueWindAngle * Math.PI) / 180;
+
+  // Calculate apparent wind components using vector addition
+  // True wind components (in boat reference frame)
+  const trueWindX = trueWindSpeed * Math.sin(twaRad);
+  const trueWindY = trueWindSpeed * Math.cos(twaRad);
+
+  // Boat motion creates opposite wind (headwind)
+  const boatWindX = 0;
+  const boatWindY = -boatSpeed;
+
+  // Apparent wind is the vector sum
+  const apparentWindX = trueWindX + boatWindX;
+  const apparentWindY = trueWindY + boatWindY;
+
+  // Calculate apparent wind angle
+  let apparentWindAngle = Math.atan2(apparentWindX, apparentWindY) * (180 / Math.PI);
+
+  // Normalize to 0-360 range
+  if (apparentWindAngle < 0) {
+    apparentWindAngle += 360;
+  }
+
+  return apparentWindAngle;
+}
+
+/**
+ * Calculate apparent wind speed
+ *
+ * @param trueWindAngle - True wind angle in degrees (0-360)
+ * @param trueWindSpeed - True wind speed in knots
+ * @param boatSpeed - Boat speed in knots
+ * @returns Apparent wind speed in knots
+ */
+export function calculateApparentWindSpeed(
+  trueWindAngle: number,
+  trueWindSpeed: number,
+  boatSpeed: number
+): number {
+  // Convert TWA to radians
+  const twaRad = (trueWindAngle * Math.PI) / 180;
+
+  // Calculate using law of cosines
+  const apparentWindSpeed = Math.sqrt(
+    trueWindSpeed * trueWindSpeed +
+    boatSpeed * boatSpeed -
+    2 * trueWindSpeed * boatSpeed * Math.cos(twaRad)
+  );
+
+  return apparentWindSpeed;
 }
 
 /**

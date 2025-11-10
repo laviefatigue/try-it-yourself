@@ -23,6 +23,14 @@ import { getWindyService } from '../services/windyService';
 import { getNavigationService } from '../services/navigationService';
 import SailConfigDisplay from '../components/SailConfigDisplay';
 import ErrorPanel from '../components/ErrorPanel';
+import {
+  validateWindSpeed,
+  validateTWA,
+  validateBoatSpeed,
+  validateHeading,
+  validateTideSpeed,
+  sanitizeNumericInput,
+} from '../utils/validation';
 
 const SailingScreen: React.FC = () => {
   // GPS and sensor data
@@ -95,8 +103,9 @@ const SailingScreen: React.FC = () => {
         const speedKnots = location.coords.speed * 1.94384;
         setBoatSpeed(speedKnots.toFixed(1));
       }
-    } catch (err: any) {
-      setError(`Failed to get location: ${err.message}`);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Failed to get location: ${errorMessage}`);
     }
   };
 
@@ -120,10 +129,84 @@ const SailingScreen: React.FC = () => {
         // Update wind speed and direction inputs
         setWindSpeed(result.forecast.windSpeed.toFixed(1));
       }
-    } catch (err: any) {
-      setError(`Failed to fetch wind forecast: ${err.message}`);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Failed to fetch wind forecast: ${errorMessage}`);
     } finally {
       setLoadingForecast(false);
+    }
+  };
+
+  // Validated input handlers
+  const handleWindSpeedChange = (value: string) => {
+    const sanitized = sanitizeNumericInput(value);
+    setWindSpeed(sanitized);
+
+    if (sanitized) {
+      const validation = validateWindSpeed(sanitized);
+      if (!validation.valid) {
+        setError(validation.error || null);
+      }
+    }
+  };
+
+  const handleTWAChange = (value: string) => {
+    const sanitized = sanitizeNumericInput(value);
+    setTrueWindAngle(sanitized);
+
+    if (sanitized) {
+      const validation = validateTWA(sanitized);
+      if (!validation.valid) {
+        setError(validation.error || null);
+      }
+    }
+  };
+
+  const handleBoatHeadingChange = (value: string) => {
+    const sanitized = sanitizeNumericInput(value);
+    setBoatHeading(sanitized);
+
+    if (sanitized) {
+      const validation = validateHeading(sanitized);
+      if (!validation.valid) {
+        setError(validation.error || null);
+      }
+    }
+  };
+
+  const handleBoatSpeedChange = (value: string) => {
+    const sanitized = sanitizeNumericInput(value);
+    setBoatSpeed(sanitized);
+
+    if (sanitized) {
+      const validation = validateBoatSpeed(sanitized);
+      if (!validation.valid) {
+        setError(validation.error || null);
+      }
+    }
+  };
+
+  const handleTideSpeedChange = (value: string) => {
+    const sanitized = sanitizeNumericInput(value);
+    setTideSpeed(sanitized);
+
+    if (sanitized) {
+      const validation = validateTideSpeed(sanitized);
+      if (!validation.valid) {
+        setError(validation.error || null);
+      }
+    }
+  };
+
+  const handleTideDirectionChange = (value: string) => {
+    const sanitized = sanitizeNumericInput(value);
+    setTideDirection(sanitized);
+
+    if (sanitized) {
+      const validation = validateHeading(sanitized);
+      if (!validation.valid) {
+        setError(validation.error || null);
+      }
     }
   };
 
@@ -131,8 +214,21 @@ const SailingScreen: React.FC = () => {
     const ws = parseFloat(windSpeed);
     const twa = parseFloat(trueWindAngle);
 
-    if (isNaN(ws) || isNaN(twa)) {
-      setError('Please enter valid wind speed and angle');
+    // Validate inputs before calculation
+    if (!windSpeed || !trueWindAngle) {
+      setError('Please enter wind speed and angle');
+      return;
+    }
+
+    const wsValidation = validateWindSpeed(ws);
+    if (!wsValidation.valid) {
+      setError(wsValidation.error || 'Invalid wind speed');
+      return;
+    }
+
+    const twaValidation = validateTWA(twa);
+    if (!twaValidation.valid) {
+      setError(twaValidation.error || 'Invalid TWA');
       return;
     }
 
@@ -168,8 +264,9 @@ const SailingScreen: React.FC = () => {
       }
 
       return recommendation;
-    } catch (err: any) {
-      setError(`Calculation error: ${err.message}`);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Calculation error: ${errorMessage}`);
       return null;
     }
   };
@@ -222,7 +319,7 @@ const SailingScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 value={windSpeed}
-                onChangeText={setWindSpeed}
+                onChangeText={handleWindSpeedChange}
                 keyboardType="numeric"
                 placeholder="10"
               />
@@ -232,7 +329,7 @@ const SailingScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 value={trueWindAngle}
-                onChangeText={setTrueWindAngle}
+                onChangeText={handleTWAChange}
                 keyboardType="numeric"
                 placeholder="90"
               />
@@ -273,7 +370,7 @@ const SailingScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 value={boatHeading}
-                onChangeText={setBoatHeading}
+                onChangeText={handleBoatHeadingChange}
                 keyboardType="numeric"
                 placeholder="0"
               />
@@ -283,7 +380,7 @@ const SailingScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 value={boatSpeed}
-                onChangeText={setBoatSpeed}
+                onChangeText={handleBoatSpeedChange}
                 keyboardType="numeric"
                 placeholder="0"
               />
@@ -300,7 +397,7 @@ const SailingScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 value={tideSpeed}
-                onChangeText={setTideSpeed}
+                onChangeText={handleTideSpeedChange}
                 keyboardType="numeric"
                 placeholder="0"
               />
@@ -310,7 +407,7 @@ const SailingScreen: React.FC = () => {
               <TextInput
                 style={styles.input}
                 value={tideDirection}
-                onChangeText={setTideDirection}
+                onChangeText={handleTideDirectionChange}
                 keyboardType="numeric"
                 placeholder="0"
               />

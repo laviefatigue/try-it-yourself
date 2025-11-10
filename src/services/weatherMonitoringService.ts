@@ -9,6 +9,7 @@ import {
 } from '../types/sailing';
 import { getWindyService } from './windyService';
 import { calculateDistance, calculateBearing } from '../utils/sailingCalculations';
+import { sendWeatherAlert } from './notificationApi';
 
 export interface MonitoringConfig {
   intervalHours: number; // Check weather every X hours
@@ -335,19 +336,32 @@ export class WeatherMonitoringService {
   }
 
   /**
-   * Send push notification (placeholder - needs expo-notifications)
+   * Send push notification via backend API
    */
-  private sendPushNotification(alert: WeatherAlert) {
-    // TODO: Implement with expo-notifications
-    console.log('PUSH NOTIFICATION:', alert.message);
+  private async sendPushNotification(alert: WeatherAlert) {
+    try {
+      const result = await sendWeatherAlert(alert);
+      if (!result.success) {
+        console.error('Failed to send push notification:', result.error);
+      }
+    } catch (error) {
+      console.error('Error sending push notification:', error);
+    }
   }
 
   /**
-   * Send SMS notification (placeholder - needs Twilio or similar)
+   * Send SMS notification via backend API
    */
-  private sendSMSNotification(alert: WeatherAlert) {
-    // TODO: Implement with SMS service (Twilio, AWS SNS, etc.)
-    console.log(`SMS to ${this.config.phoneNumber}:`, alert.message);
+  private async sendSMSNotification(alert: WeatherAlert) {
+    try {
+      // SMS is sent automatically by backend for critical alerts via sendWeatherAlert
+      const result = await sendWeatherAlert(alert);
+      if (!result.success) {
+        console.error('Failed to send SMS notification:', result.error);
+      }
+    } catch (error) {
+      console.error('Error sending SMS notification:', error);
+    }
   }
 
   /**

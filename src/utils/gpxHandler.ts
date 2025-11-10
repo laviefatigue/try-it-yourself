@@ -86,10 +86,11 @@ export function parseGPX(gpxContent: string): Promise<GPXParseResult> {
         }
 
         resolve({ waypoints });
-      } catch (error: any) {
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         resolve({
           waypoints: [],
-          error: `Error processing GPX data: ${error.message}`,
+          error: `Error processing GPX data: ${errorMessage}`,
         });
       }
     });
@@ -153,10 +154,11 @@ export function validateGPX(gpxContent: string): { valid: boolean; error?: strin
     }
 
     return { valid: true };
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return {
       valid: false,
-      error: `GPX validation error: ${error.message}`,
+      error: `GPX validation error: ${errorMessage}`,
     };
   }
 }

@@ -56,4 +56,10 @@ const RouteSchema = new Schema<IRoute>(
   }
 );
 
+// Indexes for performance
+RouteSchema.index({ userId: 1, updatedAt: -1 });
+RouteSchema.index({ userId: 1, active: 1 });
+RouteSchema.index({ userId: 1, completed: 1 });
+RouteSchema.index({ active: 1, completed: 1 });
+
 export default mongoose.model<IRoute>('Route', RouteSchema);

@@ -67,7 +67,7 @@ const RouteScreen: React.FC = () => {
 
       setRoute(newRoute);
       Alert.alert('Success', `Imported ${parseResult.waypoints.length} waypoints`);
-    } catch (err: any) {
+    } catch (err) {
       setError(`Failed to import GPX: ${err.message}`);
     }
   };
@@ -90,7 +90,7 @@ const RouteScreen: React.FC = () => {
         `Route exported to:\n${filePath}\n\nYou can share this file using the Files app.`,
         [{ text: 'OK' }]
       );
-    } catch (err: any) {
+    } catch (err) {
       setError(`Failed to export GPX: ${err.message}`);
     }
   };

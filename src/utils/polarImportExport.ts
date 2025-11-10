@@ -14,7 +14,7 @@ export async function exportPolarToJSON(polar: PolarDiagram): Promise<string> {
 
     await FileSystem.writeAsStringAsync(filePath, jsonString);
     return filePath;
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(`Failed to export polar diagram: ${error.message}`);
   }
 }
@@ -40,7 +40,7 @@ export function importPolarFromJSON(jsonString: string): PolarDiagram {
     }
 
     return polar;
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(`Failed to import polar diagram: ${error.message}`);
   }
 }
@@ -93,7 +93,7 @@ export async function exportPolarToCSV(
 
     await FileSystem.writeAsStringAsync(filePath, csv);
     return filePath;
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(`Failed to export polar to CSV: ${error.message}`);
   }
 }
