@@ -11,7 +11,7 @@ export interface GPXParseResult {
 /**
  * Parse GPX file content into waypoints
  */
-export function parseGPX(gpxContent: string): GPXParseResult {
+export function parseGPX(gpxContent: string): Promise<GPXParseResult> {
   return new Promise((resolve) => {
     parseString(gpxContent, (err, result) => {
       if (err) {

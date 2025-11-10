@@ -1,6 +1,31 @@
 # Lagoon 440 Sailing Application
 
-A comprehensive mobile application designed for Lagoon 440 catamaran sailing, providing sail configuration recommendations, navigation tracking, and route management with real-time wind forecasts.
+A comprehensive cloud-based mobile application designed for Lagoon 440 catamaran sailing, providing sail configuration recommendations, navigation tracking, route management with real-time wind forecasts, weather monitoring, storm avoidance, and multi-user support.
+
+## 🚀 New Features
+
+### Weather Monitoring & Alerts
+- **Configurable Monitoring**: Check weather every X hours, forecast ahead X days
+- **Storm Detection**: Automatic detection of storm systems (>40 kts)
+- **Squall Alerts**: Identify sudden wind shifts and gusts
+- **High Wind/Wave Warnings**: Customizable thresholds
+- **Daytime Arrival Planning**: Ensures arrival during daylight hours (6 AM - 6 PM)
+- **Route Weather Analysis**: Checks weather at waypoints and intermediate points
+- **Push & SMS Notifications**: Critical alerts via push notifications and SMS
+- **Weather History**: Track and compare forecast accuracy vs actual conditions
+
+### Cloud Backend & User Accounts
+- **Azure-Hosted API**: Scalable cloud infrastructure
+- **User Authentication**: Secure login system with JWT tokens
+- **Multi-User Support**: Each user has their own routes and settings
+- **Route Sync**: Routes saved to cloud, accessible from any device
+- **Profile Management**: Customize notification preferences and monitoring settings
+
+### Notifications
+- **Push Notifications**: Real-time alerts via Expo notifications
+- **SMS Alerts**: Critical weather alerts via SMS (Twilio integration)
+- **Configurable**: Enable/disable by notification type
+- **Smart Routing**: Only sends critical alerts via SMS to save costs
 
 ## Features
 
