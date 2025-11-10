@@ -10,7 +10,7 @@ interface PolarChartProps {
   currentSpeed?: number;
 }
 
-const PolarChart: React.FC<PolarChartProps> = ({
+const PolarChart: React.FC<PolarChartProps> = React.memo(({
   polar,
   windSpeed,
   currentTWA,
@@ -187,7 +187,7 @@ const PolarChart: React.FC<PolarChartProps> = ({
       {renderSailConfigurations()}
     </ScrollView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

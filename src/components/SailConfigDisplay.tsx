@@ -8,7 +8,7 @@ interface SailConfigDisplayProps {
   description: string;
 }
 
-const SailConfigDisplay: React.FC<SailConfigDisplayProps> = ({
+const SailConfigDisplay: React.FC<SailConfigDisplayProps> = React.memo(({
   configuration,
   expectedSpeed,
   description,
@@ -38,7 +38,7 @@ const SailConfigDisplay: React.FC<SailConfigDisplayProps> = ({
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

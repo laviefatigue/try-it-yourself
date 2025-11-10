@@ -4,21 +4,39 @@ import WeatherHistory from '../models/WeatherHistory';
 
 const router = express.Router();
 
-// Get weather history
+// Get weather history (with pagination)
 router.get('/history', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { limit = 100, routeId } = req.query;
+    const query: Record<string, unknown> = { userId: req.userId };
 
-    const query: any = { userId: req.userId };
-    if (routeId) {
-      query.routeId = routeId;
+    if (req.query.routeId) {
+      query.routeId = req.query.routeId;
     }
+
+    // Pagination parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const skip = (page - 1) * limit;
+
+    // Ensure reasonable limits
+    const validLimit = Math.min(Math.max(limit, 1), 100);
 
     const history = await WeatherHistory.find(query)
       .sort({ timestamp: -1 })
-      .limit(parseInt(limit as string));
+      .skip(skip)
+      .limit(validLimit);
 
-    res.json({ history });
+    const total = await WeatherHistory.countDocuments(query);
+
+    res.json({
+      history,
+      pagination: {
+        page,
+        limit: validLimit,
+        total,
+        pages: Math.ceil(total / validLimit),
+      },
+    });
   } catch (error) {
     console.error('Fetch weather history error:', error);
     res.status(500).json({ error: 'Failed to fetch weather history' });

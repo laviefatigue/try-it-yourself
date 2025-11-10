@@ -4,11 +4,33 @@ import Route from '../models/Route';
 
 const router = express.Router();
 
-// Get all routes for user
+// Get all routes for user (with pagination)
 router.get('/', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const routes = await Route.find({ userId: req.userId }).sort({ updatedAt: -1 });
-    res.json({ routes });
+    // Pagination parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const skip = (page - 1) * limit;
+
+    // Ensure reasonable limits
+    const validLimit = Math.min(Math.max(limit, 1), 100);
+
+    const routes = await Route.find({ userId: req.userId })
+      .sort({ updatedAt: -1 })
+      .skip(skip)
+      .limit(validLimit);
+
+    const total = await Route.countDocuments({ userId: req.userId });
+
+    res.json({
+      routes,
+      pagination: {
+        page,
+        limit: validLimit,
+        total,
+        pages: Math.ceil(total / validLimit),
+      },
+    });
   } catch (error) {
     console.error('Fetch routes error:', error);
     res.status(500).json({ error: 'Failed to fetch routes' });

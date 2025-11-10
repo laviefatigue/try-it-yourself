@@ -6,7 +6,7 @@ interface ErrorPanelProps {
   onDismiss: () => void;
 }
 
-const ErrorPanel: React.FC<ErrorPanelProps> = ({ error, onDismiss }) => {
+const ErrorPanel: React.FC<ErrorPanelProps> = React.memo(({ error, onDismiss }) => {
   if (!error) return null;
 
   return (
@@ -19,7 +19,7 @@ const ErrorPanel: React.FC<ErrorPanelProps> = ({ error, onDismiss }) => {
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
